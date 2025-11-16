@@ -1,0 +1,140 @@
+export const shotListTemplates = {
+  Wedding: [
+    { scene: 'Pre-Ceremony', subject: 'Venue Details', lens: 'Wide 24mm', lighting: 'Natural light', priority: 'medium' as const },
+    { scene: 'Pre-Ceremony', subject: 'Dress & Details', lens: 'Standard 50mm', lighting: 'Soft window light', priority: 'high' as const },
+    { scene: 'Pre-Ceremony', subject: 'Rings & Accessories', lens: 'Macro', lighting: 'Natural light with reflector', priority: 'high' as const },
+    { scene: 'Ceremony', subject: 'Processional', lens: 'Portrait 85mm', lighting: 'Available light', priority: 'high' as const },
+    { scene: 'Ceremony', subject: 'First Kiss', lens: 'Portrait 85mm', lighting: 'Available light', priority: 'high' as const },
+    { scene: 'Ceremony', subject: 'Recessional', lens: 'Portrait 85mm', lighting: 'Available light', priority: 'high' as const },
+    { scene: 'Portraits', subject: 'Couple Portraits', lens: 'Portrait 85mm', lighting: 'Golden hour natural', priority: 'high' as const },
+    { scene: 'Portraits', subject: 'Family Groups', lens: 'Standard 50mm', lighting: 'Mixed natural/flash', priority: 'medium' as const },
+    { scene: 'Portraits', subject: 'Bridal Party', lens: 'Standard 50mm', lighting: 'Mixed natural/flash', priority: 'medium' as const },
+    { scene: 'Reception', subject: 'First Dance', lens: 'Portrait 85mm', lighting: 'Ambient + flash', priority: 'high' as const },
+    { scene: 'Reception', subject: 'Cake Cutting', lens: 'Standard 50mm', lighting: 'Flash', priority: 'medium' as const },
+    { scene: 'Reception', subject: 'Candids & Dancing', lens: 'Wide 24mm', lighting: 'Flash', priority: 'medium' as const },
+  ],
+  'Corporate Event': [
+    { scene: 'Venue Setup', subject: 'Wide Venue Shot', lens: 'Wide 24mm', lighting: 'Available light', priority: 'medium' as const },
+    { scene: 'Venue Setup', subject: 'Stage & Branding', lens: 'Standard 50mm', lighting: 'Available light', priority: 'high' as const },
+    { scene: 'Venue Setup', subject: 'Table Settings', lens: 'Standard 50mm', lighting: 'Available light', priority: 'low' as const },
+    { scene: 'Main Event', subject: 'Keynote Speaker', lens: 'Telephoto 200mm', lighting: 'Stage lighting', priority: 'high' as const },
+    { scene: 'Main Event', subject: 'Audience Reaction', lens: 'Standard 50mm', lighting: 'Available light', priority: 'medium' as const },
+    { scene: 'Main Event', subject: 'Presentations', lens: 'Telephoto 200mm', lighting: 'Stage lighting', priority: 'high' as const },
+    { scene: 'Networking', subject: 'Attendees Networking', lens: 'Standard 50mm', lighting: 'Mixed natural/flash', priority: 'medium' as const },
+    { scene: 'Networking', subject: 'Executive Portraits', lens: 'Portrait 85mm', lighting: 'Flash with softbox', priority: 'high' as const },
+    { scene: 'Details', subject: 'Branded Materials', lens: 'Standard 50mm', lighting: 'Natural light', priority: 'medium' as const },
+  ],
+  Product: [
+    { scene: 'Hero Shot', subject: 'Main Product', lens: 'Standard 50mm', lighting: '3-point lighting setup', priority: 'high' as const },
+    { scene: 'Details', subject: 'Product Texture Close-up', lens: 'Macro', lighting: 'Softbox with diffusion', priority: 'high' as const },
+    { scene: 'Details', subject: 'Logo/Branding Detail', lens: 'Macro', lighting: 'Soft overhead light', priority: 'medium' as const },
+    { scene: 'Context', subject: 'Lifestyle Shot', lens: 'Standard 50mm', lighting: 'Natural window light', priority: 'high' as const },
+    { scene: 'Context', subject: 'In-Use Action Shot', lens: 'Standard 50mm', lighting: 'Natural light + reflector', priority: 'medium' as const },
+    { scene: 'Variations', subject: 'Different Angles', lens: 'Standard 50mm', lighting: '3-point lighting', priority: 'medium' as const },
+    { scene: 'Variations', subject: 'Color Variants', lens: 'Standard 50mm', lighting: '3-point lighting', priority: 'low' as const },
+    { scene: 'Scale', subject: 'Size Reference Shot', lens: 'Standard 50mm', lighting: 'Soft diffused light', priority: 'low' as const },
+  ],
+  Portrait: [
+    { scene: 'Headshot', subject: 'Professional Headshot', lens: 'Portrait 85mm', lighting: 'Butterfly lighting', priority: 'high' as const },
+    { scene: 'Headshot', subject: 'Alternative Angle', lens: 'Portrait 85mm', lighting: 'Rembrandt lighting', priority: 'medium' as const },
+    { scene: 'Full Body', subject: 'Standing Portrait', lens: 'Standard 50mm', lighting: 'Split lighting', priority: 'high' as const },
+    { scene: 'Full Body', subject: 'Seated Portrait', lens: 'Standard 50mm', lighting: 'Broad lighting', priority: 'medium' as const },
+    { scene: 'Environmental', subject: 'Workplace Context', lens: 'Wide 35mm', lighting: 'Natural + fill flash', priority: 'high' as const },
+    { scene: 'Environmental', subject: 'Hobby/Interest Context', lens: 'Standard 50mm', lighting: 'Natural light', priority: 'medium' as const },
+    { scene: 'Details', subject: 'Hands/Details', lens: 'Portrait 85mm', lighting: 'Soft window light', priority: 'low' as const },
+  ],
+  'Real Estate': [
+    { scene: 'Exterior', subject: 'Front Facade', lens: 'Wide 24mm', lighting: 'Golden hour', priority: 'high' as const },
+    { scene: 'Exterior', subject: 'Backyard/Outdoor Space', lens: 'Wide 24mm', lighting: 'Golden hour', priority: 'high' as const },
+    { scene: 'Exterior', subject: 'Street View', lens: 'Wide 24mm', lighting: 'Daytime', priority: 'medium' as const },
+    { scene: 'Living Areas', subject: 'Living Room Wide', lens: 'Wide 16mm', lighting: 'Flash + ambient', priority: 'high' as const },
+    { scene: 'Living Areas', subject: 'Dining Room', lens: 'Wide 16mm', lighting: 'Flash + ambient', priority: 'high' as const },
+    { scene: 'Kitchen', subject: 'Kitchen Overview', lens: 'Wide 16mm', lighting: 'Flash + ambient', priority: 'high' as const },
+    { scene: 'Bedrooms', subject: 'Master Bedroom', lens: 'Wide 16mm', lighting: 'Natural + flash', priority: 'high' as const },
+    { scene: 'Bedrooms', subject: 'Secondary Bedrooms', lens: 'Wide 16mm', lighting: 'Natural + flash', priority: 'medium' as const },
+    { scene: 'Bathrooms', subject: 'Master Bathroom', lens: 'Wide 16mm', lighting: 'Flash', priority: 'high' as const },
+    { scene: 'Details', subject: 'Unique Features', lens: 'Standard 24mm', lighting: 'Natural light', priority: 'medium' as const },
+  ],
+};
+
+export const equipmentCategories = {
+  cameras: [
+    { name: 'Primary Camera Body', category: 'Cameras' },
+    { name: 'Backup Camera Body', category: 'Cameras' },
+    { name: 'Mirrorless Body', category: 'Cameras' },
+  ],
+  lenses: [
+    { name: 'Wide Angle 16-35mm', category: 'Lenses' },
+    { name: 'Standard Zoom 24-70mm', category: 'Lenses' },
+    { name: 'Portrait Prime 85mm', category: 'Lenses' },
+    { name: 'Telephoto 70-200mm', category: 'Lenses' },
+    { name: 'Macro 100mm', category: 'Lenses' },
+  ],
+  lighting: [
+    { name: 'Speedlight x2', category: 'Lighting' },
+    { name: 'LED Panel', category: 'Lighting' },
+    { name: 'Softbox', category: 'Lighting' },
+    { name: 'Reflector 5-in-1', category: 'Lighting' },
+    { name: 'Light Stands x3', category: 'Lighting' },
+  ],
+  audio: [
+    { name: 'Wireless Lavalier Mic', category: 'Audio' },
+    { name: 'Shotgun Microphone', category: 'Audio' },
+    { name: 'Audio Recorder', category: 'Audio' },
+    { name: 'Monitoring Headphones', category: 'Audio' },
+  ],
+  accessories: [
+    { name: 'Tripod', category: 'Accessories' },
+    { name: 'Monopod', category: 'Accessories' },
+    { name: 'Memory Cards (128GB) x4', category: 'Accessories' },
+    { name: 'Extra Batteries x6', category: 'Accessories' },
+    { name: 'Battery Chargers', category: 'Accessories' },
+    { name: 'Lens Cleaning Kit', category: 'Accessories' },
+    { name: 'Camera Bag', category: 'Accessories' },
+    { name: 'Rain Cover', category: 'Accessories' },
+  ],
+};
+
+export const crewRoles = [
+  'Lead Photographer',
+  'Assistant Photographer',
+  'Videographer',
+  'Video Assistant',
+  'Makeup Artist',
+  'Hair Stylist',
+  'Stylist',
+  'Production Assistant',
+  'Location Manager',
+  'Digital Tech',
+];
+
+export const moodBoardStyles = [
+  'Modern',
+  'Classic',
+  'Cinematic',
+  'Editorial',
+  'Documentary',
+  'Commercial',
+  'Minimalist',
+  'Dramatic',
+  'Romantic',
+  'Vintage',
+];
+
+export const lensOptions = [
+  'Ultra Wide 16mm',
+  'Wide 24mm',
+  'Standard 35mm',
+  'Standard 50mm',
+  'Portrait 85mm',
+  'Telephoto 200mm',
+  'Macro',
+];
+
+export const lightingConditions = [
+  'Natural',
+  'Artificial needed',
+  'Mixed',
+  'Low light',
+  'Controlled studio',
+];

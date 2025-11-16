@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 189 100% 50%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 281 100% 57%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 189 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-[#0a0a0a] text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-lg;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    @apply bg-white/10 border-white/20;
+    transform: translateY(-2px);
+  }
+
+  .glass-button {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-lg px-4 py-2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-button:hover {
+    @apply bg-white/10 border-white/20;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-[#00F5FF] to-[#B026FF] bg-clip-text text-transparent;
+  }
+
+  .cyan-glow {
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+  }
+
+  .purple-glow {
+    box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+  }
+}
