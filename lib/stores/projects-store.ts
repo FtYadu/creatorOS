@@ -1,48 +1,107 @@
 import { create } from 'zustand';
 import { Project, ProjectStage } from '@/types';
-import { mockProjects } from '@/lib/utils/mock-data';
+import { projectsService } from '@/lib/services/projects-service';
+import toast from 'react-hot-toast';
 
 interface ProjectsState {
   projects: Project[];
   isLoading: boolean;
   selectedProject: Project | null;
-  setProjects: (projects: Project[]) => void;
-  addProject: (project: Project) => void;
-  updateProject: (id: string, updates: Partial<Project>) => void;
-  moveProject: (id: string, newStage: ProjectStage) => void;
-  deleteProject: (id: string) => void;
+  fetchProjects: (stage?: ProjectStage) => Promise<void>;
+  fetchProject: (id: string) => Promise<void>;
+  createProject: (project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
+  moveProject: (id: string, newStage: ProjectStage) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
   setSelectedProject: (project: Project | null) => void;
-  setLoading: (loading: boolean) => void;
 }
 
-export const useProjectsStore = create<ProjectsState>((set) => ({
-  projects: mockProjects,
+export const useProjectsStore = create<ProjectsState>((set, get) => ({
+  projects: [],
   isLoading: false,
   selectedProject: null,
 
-  setProjects: (projects) => set({ projects }),
+  fetchProjects: async (stage?: ProjectStage) => {
+    set({ isLoading: true });
+    try {
+      const projects = await projectsService.getAll(stage);
+      set({ projects, isLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+      toast.error('Failed to load projects');
+      set({ isLoading: false });
+    }
+  },
 
-  addProject: (project) => set((state) => ({
-    projects: [...state.projects, project]
-  })),
+  fetchProject: async (id: string) => {
+    set({ isLoading: true });
+    try {
+      const project = await projectsService.getById(id);
+      set({ selectedProject: project, isLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch project:', error);
+      toast.error('Failed to load project');
+      set({ isLoading: false });
+    }
+  },
 
-  updateProject: (id, updates) => set((state) => ({
-    projects: state.projects.map(p =>
-      p.id === id ? { ...p, ...updates, updatedAt: new Date() } : p
-    )
-  })),
+  createProject: async (project) => {
+    set({ isLoading: true });
+    try {
+      const newProject = await projectsService.create(project);
+      set((state) => ({
+        projects: [...state.projects, newProject],
+        isLoading: false,
+      }));
+      toast.success('Project created successfully');
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      toast.error('Failed to create project');
+      set({ isLoading: false });
+    }
+  },
 
-  moveProject: (id, newStage) => set((state) => ({
-    projects: state.projects.map(p =>
-      p.id === id ? { ...p, stage: newStage, updatedAt: new Date() } : p
-    )
-  })),
+  updateProject: async (id, updates) => {
+    set({ isLoading: true });
+    try {
+      const updated = await projectsService.update(id, updates);
+      set((state) => ({
+        projects: state.projects.map((p) => (p.id === id ? updated : p)),
+        selectedProject: state.selectedProject?.id === id ? updated : state.selectedProject,
+        isLoading: false,
+      }));
+      toast.success('Project updated successfully');
+    } catch (error) {
+      console.error('Failed to update project:', error);
+      toast.error('Failed to update project');
+      set({ isLoading: false });
+    }
+  },
 
-  deleteProject: (id) => set((state) => ({
-    projects: state.projects.filter(p => p.id !== id)
-  })),
+  moveProject: async (id, newStage) => {
+    try {
+      await get().updateProject(id, { stage: newStage });
+    } catch (error) {
+      console.error('Failed to move project:', error);
+    }
+  },
+
+  deleteProject: async (id) => {
+    set({ isLoading: true });
+    try {
+      await projectsService.delete(id);
+      set((state) => ({
+        projects: state.projects.filter((p) => p.id !== id),
+        selectedProject: state.selectedProject?.id === id ? null : state.selectedProject,
+        isLoading: false,
+      }));
+      toast.success('Project deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+      toast.error('Failed to delete project');
+      set({ isLoading: false });
+    }
+  },
 
   setSelectedProject: (project) => set({ selectedProject: project }),
-
-  setLoading: (loading) => set({ isLoading: loading })
 }));
