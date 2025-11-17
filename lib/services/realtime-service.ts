@@ -71,10 +71,14 @@ export class RealtimeService {
         },
         async (payload) => {
           // Verify the comment belongs to a review version of this project
+          const reviewVersionId = (payload.new as any)?.review_version_id || (payload.old as any)?.review_version_id;
+
+          if (!reviewVersionId) return;
+
           const { data } = await this.supabase
             .from('review_versions')
             .select('project_id')
-            .eq('id', payload.new?.review_version_id || payload.old?.review_version_id)
+            .eq('id', reviewVersionId)
             .single();
 
           if (data?.project_id === projectId) {
@@ -104,10 +108,14 @@ export class RealtimeService {
         },
         async (payload) => {
           // Verify the task belongs to the user's project
+          const projectId = (payload.new as any)?.project_id || (payload.old as any)?.project_id;
+
+          if (!projectId) return;
+
           const { data } = await this.supabase
             .from('projects')
             .select('user_id')
-            .eq('id', payload.new?.project_id || payload.old?.project_id)
+            .eq('id', projectId)
             .single();
 
           if (data?.user_id === userId) {

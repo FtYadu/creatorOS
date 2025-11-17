@@ -12,6 +12,9 @@ const anthropic = new Anthropic({
 
 // POST /api/ai/generate-caption - Generate social media caption
 export async function POST(request: NextRequest) {
+  let platform = 'instagram';
+  let projectType = 'Photography';
+
   try {
     const supabase = createRouteHandlerClient({ cookies });
     const { data: { session } } = await supabase.auth.getSession();
@@ -20,7 +23,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { platform, projectType, tone, keywords } = await request.json();
+    const body = await request.json();
+    platform = body.platform;
+    projectType = body.projectType;
+    const tone = body.tone;
+    const keywords = body.keywords;
 
     if (!platform || !projectType) {
       return NextResponse.json(
@@ -87,7 +94,7 @@ Respond ONLY with the JSON object.`
 
 function generateFallbackHashtags(platform: string, projectType: string): string[] {
   const base = ['photography', 'photographer', 'photooftheday'];
-  const typeSpecific = {
+  const typeSpecific: Record<string, string[]> = {
     Wedding: ['weddingphotography', 'weddingday', 'bride', 'groom'],
     Corporate: ['corporatephotography', 'businessphotography', 'professional'],
     Event: ['eventphotography', 'events', 'eventplanner'],
@@ -96,5 +103,5 @@ function generateFallbackHashtags(platform: string, projectType: string): string
     Fashion: ['fashionphotography', 'fashionshoot', 'model'],
   };
 
-  return [...base, ...(typeSpecific[projectType as keyof typeof typeSpecific] || ['creative'])];
+  return [...base, ...(typeSpecific[projectType] || ['creative'])];
 }

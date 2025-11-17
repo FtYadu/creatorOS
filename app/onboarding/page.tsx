@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Camera, Check, ArrowRight, ArrowLeft } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import toast from 'react-hot-toast';
 
 const STEPS = [
@@ -114,7 +113,13 @@ export default function OnboardingPage() {
               Step {currentStep + 1} of {STEPS.length}
             </span>
           </div>
-          <Progress value={progress} className="h-2" />
+          {/* Simple progress bar without Radix UI */}
+          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
         {/* Content */}

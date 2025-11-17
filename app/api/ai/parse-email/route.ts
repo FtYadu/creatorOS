@@ -12,6 +12,8 @@ const anthropic = new Anthropic({
 
 // POST /api/ai/parse-email - Parse inquiry email and score lead
 export async function POST(request: NextRequest) {
+  let emailText = '';
+
   try {
     const supabase = createRouteHandlerClient({ cookies });
     const { data: { session } } = await supabase.auth.getSession();
@@ -20,7 +22,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { emailText } = await request.json();
+    const body = await request.json();
+    emailText = body.emailText;
 
     if (!emailText) {
       return NextResponse.json({ error: 'Email text is required' }, { status: 400 });
