@@ -78,7 +78,7 @@ export function BackupDashboard({ projectId }: BackupDashboardProps) {
 
     const { data, error } = await supabase
       .from('backup_locations')
-      .insert(locationsToInsert)
+      .insert(locationsToInsert as any)
       .select();
 
     if (error) {

@@ -48,10 +48,11 @@ export function EquipmentPlanner({ projectId, open, onOpenChange }: EquipmentPla
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (equipmentList) {
-      setEquipmentListId(equipmentList.id);
+    const record = equipmentList as any;
+    if (record) {
+      setEquipmentListId(record.id);
 
-      const loadedItems = (equipmentList.equipment_items || []).map((item: any) => ({
+      const loadedItems = (record.equipment_items || []).map((item: any) => ({
         id: item.id,
         equipmentListId: item.equipment_list_id,
         category: item.category,
@@ -130,14 +131,17 @@ export function EquipmentPlanner({ projectId, open, onOpenChange }: EquipmentPla
       if (!currentEquipmentListId) {
         const { data: newEquipmentList, error: listError } = await supabase
           .from('equipment_lists')
-          .insert({ project_id: projectId })
+          .insert({ project_id: projectId } as any)
           .select()
           .single();
 
         if (listError) throw listError;
-        currentEquipmentListId = newEquipmentList.id;
+        const listRecord = newEquipmentList as any;
+        currentEquipmentListId = listRecord.id;
         setEquipmentListId(currentEquipmentListId);
       }
+
+      if (!currentEquipmentListId) throw new Error('Equipment list ID is required');
 
       await supabase
         .from('equipment_items')
@@ -155,7 +159,7 @@ export function EquipmentPlanner({ projectId, open, onOpenChange }: EquipmentPla
           sort_order: item.sortOrder,
         }));
 
-        await supabase.from('equipment_items').insert(itemsToInsert);
+        await supabase.from('equipment_items').insert(itemsToInsert as any);
       }
 
       toast.success('Equipment list saved successfully!');

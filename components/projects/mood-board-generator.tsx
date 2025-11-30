@@ -121,13 +121,14 @@ export function MoodBoardGenerator({ projectId, open, onOpenChange }: MoodBoardG
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (moodBoard) {
-      setMoodBoardId(moodBoard.id);
-      setStyle(moodBoard.style);
-      setKeywords(moodBoard.keywords);
-      setColors(moodBoard.colors || []);
+    const record = moodBoard as any;
+    if (record) {
+      setMoodBoardId(record.id);
+      setStyle(record.style);
+      setKeywords(record.keywords);
+      setColors(record.colors || []);
 
-      const loadedImages = (moodBoard.mood_board_images || []).map((img: any) => ({
+      const loadedImages = (record.mood_board_images || []).map((img: any) => ({
         id: img.id,
         moodBoardId: img.mood_board_id,
         imageUrl: img.image_url,
@@ -198,16 +199,18 @@ export function MoodBoardGenerator({ projectId, open, onOpenChange }: MoodBoardG
             style,
             keywords,
             colors,
-          })
+          } as any)
           .select()
           .single();
 
         if (moodBoardError) throw moodBoardError;
-        currentMoodBoardId = newMoodBoard.id;
+        const moodBoardRecord = newMoodBoard as any;
+        currentMoodBoardId = moodBoardRecord.id;
         setMoodBoardId(currentMoodBoardId);
       } else {
         await supabase
           .from('mood_boards')
+          // @ts-expect-error - Supabase type inference without generated types
           .update({
             style,
             keywords,
@@ -216,6 +219,8 @@ export function MoodBoardGenerator({ projectId, open, onOpenChange }: MoodBoardG
           })
           .eq('id', currentMoodBoardId);
       }
+
+      if (!currentMoodBoardId) throw new Error('Mood board ID is required');
 
       await supabase
         .from('mood_board_images')
@@ -230,7 +235,7 @@ export function MoodBoardGenerator({ projectId, open, onOpenChange }: MoodBoardG
           sort_order: img.sortOrder,
         }));
 
-        await supabase.from('mood_board_images').insert(imagesToInsert);
+        await supabase.from('mood_board_images').insert(imagesToInsert as any);
       }
 
       toast.success('Mood board saved successfully!');

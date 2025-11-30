@@ -133,7 +133,7 @@ export function LocationScout({ projectId, open, onOpenChange }: LocationScoutPr
           notes: loc.notes,
         }));
 
-        await supabase.from('locations').insert(locationsToInsert);
+        await supabase.from('locations').insert(locationsToInsert as any);
       }
 
       toast.success('Locations saved successfully!');

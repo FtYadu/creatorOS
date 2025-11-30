@@ -117,22 +117,23 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (callSheetData) {
+    const record = callSheetData as any;
+    if (record) {
       setCallSheet({
-        id: callSheetData.id,
-        projectId: callSheetData.project_id,
-        shootDate: callSheetData.shoot_date ? new Date(callSheetData.shoot_date) : undefined,
-        mainContactName: callSheetData.main_contact_name || '',
-        mainContactPhone: callSheetData.main_contact_phone || '',
-        mainContactEmail: callSheetData.main_contact_email || '',
-        emergencyContacts: callSheetData.emergency_contacts || [],
-        notes: callSheetData.notes || '',
-        version: callSheetData.version || 1,
-        createdAt: new Date(callSheetData.created_at),
-        updatedAt: new Date(callSheetData.updated_at),
+        id: record.id,
+        projectId: record.project_id,
+        shootDate: record.shoot_date ? new Date(record.shoot_date) : undefined,
+        mainContactName: record.main_contact_name || '',
+        mainContactPhone: record.main_contact_phone || '',
+        mainContactEmail: record.main_contact_email || '',
+        emergencyContacts: record.emergency_contacts || [],
+        notes: record.notes || '',
+        version: record.version || 1,
+        createdAt: new Date(record.created_at),
+        updatedAt: new Date(record.updated_at),
       });
 
-      const loadedSchedule = (callSheetData.call_sheet_schedule_items || []).map((item: any) => ({
+      const loadedSchedule = (record.call_sheet_schedule_items || []).map((item: any) => ({
         id: item.id,
         callSheetId: item.call_sheet_id,
         time: item.time,
@@ -192,8 +193,9 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (equipmentData?.equipment_items) {
-      setEquipment(equipmentData.equipment_items.filter((item: any) => item.packed));
+    const equipmentRecord = equipmentData as any;
+    if (equipmentRecord?.equipment_items) {
+      setEquipment(equipmentRecord.equipment_items.filter((item: any) => item.packed));
     }
 
     const { data: shotListData } = await supabase
@@ -202,8 +204,9 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (shotListData?.shots) {
-      setShotList(shotListData.shots.filter((shot: any) => shot.priority === 'high'));
+    const shotListRecord = shotListData as any;
+    if (shotListRecord?.shots) {
+      setShotList(shotListRecord.shots.filter((shot: any) => shot.priority === 'high'));
     }
   };
 
@@ -293,15 +296,17 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
             emergency_contacts: callSheet?.emergencyContacts || [],
             notes: callSheet?.notes || '',
             version: 1,
-          })
+          } as any)
           .select()
           .single();
 
         if (callSheetError) throw callSheetError;
-        callSheetId = newCallSheet.id;
+        const callSheetRecord = newCallSheet as any;
+        callSheetId = callSheetRecord.id;
       } else {
         await supabase
           .from('call_sheets')
+          // @ts-expect-error - Supabase type inference without generated types
           .update({
             shoot_date: callSheet?.shootDate?.toISOString(),
             main_contact_name: callSheet?.mainContactName || '',
@@ -313,6 +318,8 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
           })
           .eq('id', callSheetId);
       }
+
+      if (!callSheetId) throw new Error('Call sheet ID is required');
 
       await supabase.from('call_sheet_schedule_items').delete().eq('call_sheet_id', callSheetId);
 
@@ -326,7 +333,7 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
           sort_order: item.sortOrder,
         }));
 
-        await supabase.from('call_sheet_schedule_items').insert(scheduleToInsert);
+        await supabase.from('call_sheet_schedule_items').insert(scheduleToInsert as any);
       }
 
       await supabase.from('crew_assignments').delete().eq('project_id', projectId);
@@ -342,7 +349,7 @@ export function CallSheetGenerator({ projectId, open, onOpenChange }: CallSheetG
           available: crew.available,
         }));
 
-        await supabase.from('crew_assignments').insert(crewToInsert);
+        await supabase.from('crew_assignments').insert(crewToInsert as any);
       }
 
       toast.success('Call sheet saved successfully!');

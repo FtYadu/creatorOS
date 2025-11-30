@@ -172,11 +172,12 @@ export function ShotListCreator({ projectId, open, onOpenChange }: ShotListCreat
       .eq('project_id', projectId)
       .maybeSingle();
 
-    if (shotList) {
-      setShotListId(shotList.id);
-      setSelectedTemplate(shotList.template_name || '');
+    const record = shotList as any;
+    if (record) {
+      setShotListId(record.id);
+      setSelectedTemplate(record.template_name || '');
 
-      const loadedShots = (shotList.shots || []).map((s: any) => ({
+      const loadedShots = (record.shots || []).map((s: any) => ({
         id: s.id,
         shotListId: s.shot_list_id,
         shotNumber: s.shot_number,
@@ -282,22 +283,26 @@ export function ShotListCreator({ projectId, open, onOpenChange }: ShotListCreat
           .insert({
             project_id: projectId,
             template_name: selectedTemplate,
-          })
+          } as any)
           .select()
           .single();
 
         if (shotListError) throw shotListError;
-        currentShotListId = newShotList.id;
+        const shotListRecord = newShotList as any;
+        currentShotListId = shotListRecord.id;
         setShotListId(currentShotListId);
       } else {
         await supabase
           .from('shot_lists')
+          // @ts-expect-error - Supabase type inference without generated types
           .update({
             template_name: selectedTemplate,
             updated_at: new Date().toISOString(),
           })
           .eq('id', currentShotListId);
       }
+
+      if (!currentShotListId) throw new Error("Shot list ID is required");
 
       await supabase.from('shots').delete().eq('shot_list_id', currentShotListId);
 
@@ -314,7 +319,7 @@ export function ShotListCreator({ projectId, open, onOpenChange }: ShotListCreat
           sort_order: shot.sortOrder,
         }));
 
-        await supabase.from('shots').insert(shotsToInsert);
+        await supabase.from('shots').insert(shotsToInsert as any);
       }
 
       toast.success('Shot list saved successfully!');

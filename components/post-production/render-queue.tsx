@@ -104,30 +104,31 @@ export function RenderQueue({ projectId }: RenderQueueProps) {
         status: 'queued',
         progress: 0,
         priority,
-      })
+      } as any)
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error('Error adding render task:', error);
       toast.error('Failed to add render task');
       return;
     }
 
+    const record = data as any;
     const newTask: RenderTask = {
-      id: data.id,
-      projectId: data.project_id,
-      taskName: data.task_name,
-      format: data.format,
-      resolution: data.resolution,
-      codec: data.codec,
-      estimatedSize: data.estimated_size || '',
-      estimatedTime: data.estimated_time || '',
-      status: data.status as RenderStatus,
+      id: record.id,
+      projectId: record.project_id,
+      taskName: record.task_name,
+      format: record.format,
+      resolution: record.resolution,
+      codec: record.codec,
+      estimatedSize: record.estimated_size || '',
+      estimatedTime: record.estimated_time || '',
+      status: record.status as RenderStatus,
       progress: 0,
-      priority: data.priority,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
+      priority: record.priority,
+      createdAt: new Date(record.created_at),
+      updatedAt: new Date(record.updated_at),
     };
 
     addRenderTask(projectId, newTask);
@@ -152,6 +153,7 @@ export function RenderQueue({ projectId }: RenderQueueProps) {
   const handleStartRender = async (taskId: string) => {
     const { error } = await supabase
       .from('render_tasks')
+      // @ts-expect-error - Supabase type inference without generated types
       .update({ status: 'rendering', progress: 0 })
       .eq('id', taskId);
 
@@ -174,14 +176,14 @@ export function RenderQueue({ projectId }: RenderQueueProps) {
       if (progress >= 100) {
         clearInterval(interval);
         updateRenderTask(projectId, taskId, { status: 'complete', progress: 100 });
-        supabase
+        (supabase as any)
           .from('render_tasks')
           .update({ status: 'complete', progress: 100, completed_at: new Date().toISOString() })
           .eq('id', taskId);
         toast.success('Render complete!');
       } else {
         updateRenderTask(projectId, taskId, { progress });
-        supabase.from('render_tasks').update({ progress }).eq('id', taskId);
+        (supabase as any).from('render_tasks').update({ progress }).eq('id', taskId);
       }
     }, 1000);
   };

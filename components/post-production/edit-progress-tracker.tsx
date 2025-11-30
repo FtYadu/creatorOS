@@ -83,7 +83,7 @@ export function EditProgressTracker({ projectId }: EditProgressTrackerProps) {
 
     const { data, error } = await supabase
       .from('edit_stages')
-      .insert(stagesToInsert)
+      .insert(stagesToInsert as any)
       .select();
 
     if (error) {
@@ -118,6 +118,7 @@ export function EditProgressTracker({ projectId }: EditProgressTrackerProps) {
 
     const { error } = await supabase
       .from('edit_stages')
+      // @ts-expect-error - Supabase type inference without generated types
       .update(dbUpdates)
       .eq('id', stageId);
 

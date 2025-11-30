@@ -79,7 +79,7 @@ export function DeliveryChecklist({ projectId, onGenerateDelivery }: DeliveryChe
 
     const { data, error } = await supabase
       .from('delivery_checklist_items')
-      .insert(itemsToInsert)
+      .insert(itemsToInsert as any)
       .select();
 
     if (error) {
@@ -105,6 +105,7 @@ export function DeliveryChecklist({ projectId, onGenerateDelivery }: DeliveryChe
   const handleToggle = async (itemId: string, currentCompleted: boolean) => {
     const { error } = await supabase
       .from('delivery_checklist_items')
+      // @ts-expect-error - Supabase type inference without generated types
       .update({ completed: !currentCompleted })
       .eq('id', itemId);
 
@@ -128,25 +129,26 @@ export function DeliveryChecklist({ projectId, onGenerateDelivery }: DeliveryChe
         completed: false,
         is_custom: true,
         sort_order: items.length,
-      })
+      } as any)
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error('Error adding item:', error);
       toast.error('Failed to add item');
       return;
     }
 
+    const record = data as any;
     const newItem: DeliveryChecklistItem = {
-      id: data.id,
-      projectId: data.project_id,
-      itemText: data.item_text,
-      completed: data.completed,
-      isCustom: data.is_custom,
-      sortOrder: data.sort_order,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
+      id: record.id,
+      projectId: record.project_id,
+      itemText: record.item_text,
+      completed: record.completed,
+      isCustom: record.is_custom,
+      sortOrder: record.sort_order,
+      createdAt: new Date(record.created_at),
+      updatedAt: new Date(record.updated_at),
     };
 
     addChecklistItem(projectId, newItem);

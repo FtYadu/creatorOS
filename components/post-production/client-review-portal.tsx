@@ -119,26 +119,27 @@ export function ClientReviewPortal({ projectId }: ClientReviewPortalProps) {
         version_name: newVersionName,
         file_url: newVersionUrl || null,
         status: 'pending',
-      })
+      } as any)
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error('Error adding version:', error);
       toast.error('Failed to add version');
       return;
     }
 
+    const record = data as any;
     const newVersion: ReviewVersion = {
-      id: data.id,
-      projectId: data.project_id,
-      versionName: data.version_name,
-      fileUrl: data.file_url,
-      uploadDate: new Date(data.upload_date),
-      status: data.status as ReviewStatus,
+      id: record.id,
+      projectId: record.project_id,
+      versionName: record.version_name,
+      fileUrl: record.file_url,
+      uploadDate: new Date(record.upload_date),
+      status: record.status as ReviewStatus,
       comments: [],
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at),
+      createdAt: new Date(record.created_at),
+      updatedAt: new Date(record.updated_at),
     };
 
     addReviewVersion(projectId, newVersion);
@@ -160,7 +161,7 @@ export function ClientReviewPortal({ projectId }: ClientReviewPortalProps) {
         comment_type: commentType,
         resolved: false,
         commenter_name: 'Client',
-      })
+      } as any)
       .select()
       .single();
 
@@ -180,6 +181,7 @@ export function ClientReviewPortal({ projectId }: ClientReviewPortalProps) {
   const handleUpdateStatus = async (versionId: string, status: ReviewStatus) => {
     const { error } = await supabase
       .from('review_versions')
+      // @ts-expect-error - Supabase type inference without generated types
       .update({ status, approved_date: status === 'approved' ? new Date().toISOString() : null })
       .eq('id', versionId);
 
@@ -199,6 +201,7 @@ export function ClientReviewPortal({ projectId }: ClientReviewPortalProps) {
   const handleToggleResolved = async (commentId: string, currentResolved: boolean) => {
     const { error } = await supabase
       .from('review_comments')
+      // @ts-expect-error - Supabase type inference without generated types
       .update({ resolved: !currentResolved })
       .eq('id', commentId);
 
