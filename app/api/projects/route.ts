@@ -10,11 +10,9 @@ export async function GET(request: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
 
     // Check authentication
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -28,7 +26,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('projects')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     // Apply filters
@@ -64,11 +62,9 @@ export async function POST(request: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies });
 
     // Check authentication
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -87,7 +83,7 @@ export async function POST(request: NextRequest) {
       .from('projects')
       .insert([
         {
-          user_id: session.user.id,
+          user_id: user.id,
           client_name: body.clientName,
           project_type: body.projectType,
           stage: body.stage || 'leads',
