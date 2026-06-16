@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('social_posts')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (platform) query = query.eq('platform', platform);
@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('social_posts')
       .insert([{
-        user_id: session.user.id,
+        user_id: user.id,
         platform: body.platform,
         caption: body.caption || '',
         hashtags: body.hashtags || [],
