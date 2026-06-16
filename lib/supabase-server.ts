@@ -7,10 +7,14 @@ export const createServerSupabaseClient = () => {
 
 export const getServerSession = async () => {
   const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return session;
+  try {
+    const { error } = await supabase.auth.getUser();
+    if (error) return null;
+    const { data: { session } } = await supabase.auth.getSession();
+    return session;
+  } catch (error) {
+    return null;
+  }
 };
 
 export const getServerUser = async () => {
