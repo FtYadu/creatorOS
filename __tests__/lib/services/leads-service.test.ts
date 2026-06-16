@@ -203,6 +203,8 @@ describe('leadsService', () => {
       });
 
       await expect(leadsService.delete('1')).rejects.toThrow('Failed to delete lead');
+      await expect(leadsService.getById('999')).rejects.toThrow('Failed to fetch lead');
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads/999');
     });
   });
 });
