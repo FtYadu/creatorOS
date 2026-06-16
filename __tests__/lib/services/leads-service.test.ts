@@ -1,4 +1,5 @@
 import { leadsService } from '@/lib/services/leads-service';
+import { Lead } from '@/types';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -8,54 +9,200 @@ describe('leadsService', () => {
     (global.fetch as jest.Mock).mockClear();
   });
 
-  describe('getById', () => {
-    it('should fetch a lead by id successfully', async () => {
-      const mockLeadData = {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '123-456-7890',
-        project_type: 'Wedding',
-        budget: 5000,
-        timeline: '1-3 months',
-        source: 'Website',
-        stage: 'new',
-        score: 85,
-        budget_score: 80,
-        timeline_score: 90,
-        engagement_score: 85,
-        location: 'NYC',
-        requirements: ['Photo', 'Video'],
-        tags: ['VIP'],
-        referred_by: 'Jane Doe',
-        last_contact_date: '2024-01-01T00:00:00.000Z',
-        follow_up_date: '2024-01-05T00:00:00.000Z',
-        converted_to_project_id: null,
-        lost_reason: null,
-        notes: 'Some notes',
-        created_at: '2023-12-01T00:00:00.000Z',
-        updated_at: '2024-01-01T00:00:00.000Z',
-      };
+  describe('getAll', () => {
+    it('should fetch all leads', async () => {
+      const mockLeads = [
+        {
+          id: '1',
+          name: 'Test Lead',
+          email: 'test@example.com',
+          phone: '1234567890',
+          project_type: 'Wedding',
+          budget: 5000,
+          timeline: '1-3 months',
+          source: 'website',
+          stage: 'new',
+          score: 80,
+          budget_score: 20,
+          timeline_score: 30,
+          engagement_score: 30,
+          location: 'NYC',
+          requirements: [],
+          tags: [],
+          created_at: '2024-01-01',
+          updated_at: '2024-01-01',
+        },
+      ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ data: mockLeadData }),
+        json: async () => ({ data: mockLeads }),
       });
 
-      const lead = await leadsService.getById('1');
+      const leads = await leadsService.getAll();
 
-      expect(lead).toBeDefined();
-      expect(lead.id).toBe('1');
-      expect(lead.name).toBe('John Doe');
-      expect(lead.lastContactDate).toBeInstanceOf(Date);
-      expect(global.fetch).toHaveBeenCalledWith('/api/leads/1');
+      expect(leads).toHaveLength(1);
+      expect(leads[0].name).toBe('Test Lead');
+      expect(leads[0].projectType).toBe('Wedding');
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads?');
     });
 
-    it('should throw error when fetch response is not ok', async () => {
+    it('should filter leads by stage and source', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+
+      await leadsService.getAll({ stage: 'contacted', source: 'google', minScore: 50 });
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads?stage=contacted&source=google&minScore=50');
+    });
+
+    it('should throw error on failed fetch', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
       });
 
+      await expect(leadsService.getAll()).rejects.toThrow('Failed to fetch leads');
+    });
+  });
+
+  describe('getById', () => {
+    it('should fetch a lead by id', async () => {
+      const mockLead = {
+        id: '1',
+        name: 'Test Lead',
+        email: 'test@example.com',
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      };
+
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: mockLead }),
+      });
+
+      const lead = await leadsService.getById('1');
+
+      expect(lead.id).toBe('1');
+      expect(lead.name).toBe('Test Lead');
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads/1');
+    });
+
+    it('should throw error on failed fetch', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(leadsService.getById('1')).rejects.toThrow('Failed to fetch lead');
+    });
+  });
+
+  describe('create', () => {
+    it('should create a new lead', async () => {
+      const newLead = {
+        name: 'New Lead',
+        email: 'new@example.com',
+        source: 'website' as const,
+        stage: 'new' as const,
+      };
+
+      const mockResponse = {
+        id: '2',
+        name: 'New Lead',
+        email: 'new@example.com',
+        source: 'website',
+        stage: 'new',
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      };
+
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: mockResponse }),
+      });
+
+      const lead = await leadsService.create(newLead);
+
+      expect(lead.name).toBe('New Lead');
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/leads',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('"name":"New Lead"'),
+        })
+      );
+    });
+
+    it('should throw error on failed creation', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(leadsService.create({})).rejects.toThrow('Failed to create lead');
+    });
+  });
+
+  describe('update', () => {
+    it('should update an existing lead', async () => {
+      const updates = {
+        name: 'Updated Lead',
+        stage: 'contacted' as const,
+      };
+
+      const mockResponse = {
+        id: '1',
+        name: 'Updated Lead',
+        stage: 'contacted',
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      };
+
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: mockResponse }),
+      });
+
+      const lead = await leadsService.update('1', updates);
+
+      expect(lead.name).toBe('Updated Lead');
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads/1', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/leads/1',
+        expect.objectContaining({
+          method: 'PUT',
+          body: expect.stringContaining('"name":"Updated Lead"'),
+        })
+      );
+    });
+
+    it('should throw error on failed update', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(leadsService.update('1', {})).rejects.toThrow('Failed to update lead');
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a lead', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+      });
+
+      await leadsService.delete('1');
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/leads/1', expect.objectContaining({ method: 'DELETE' }));
+    });
+
+    it('should throw error on failed deletion', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(leadsService.delete('1')).rejects.toThrow('Failed to delete lead');
       await expect(leadsService.getById('999')).rejects.toThrow('Failed to fetch lead');
       expect(global.fetch).toHaveBeenCalledWith('/api/leads/999');
     });
