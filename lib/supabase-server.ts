@@ -8,8 +8,10 @@ export const createServerSupabaseClient = () => {
 export const getServerSession = async () => {
   const supabase = createServerSupabaseClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data: { session } } = await supabase.auth.getSession();
   return session;
 };
 

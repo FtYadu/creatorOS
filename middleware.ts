@@ -7,8 +7,8 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Protected routes
   const protectedRoutes = ['/dashboard', '/projects', '/inbox', '/marketing', '/calendar', '/settings'];
@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
   const authRoutes = ['/login', '/register'];
   const isAuthRoute = authRoutes.some(route => req.nextUrl.pathname.startsWith(route));
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !user) {
     // Redirect to login if accessing protected route without session
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/login';
@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isAuthRoute && session) {
+  if (isAuthRoute && user) {
     // Redirect to dashboard if accessing auth routes with active session
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/dashboard';
