@@ -149,9 +149,6 @@ function calculateLeadScore(parsed: any): any {
 }
 
 function fallbackParse(emailText: string): any {
-  const lines = emailText.split('\n');
-  const firstLine = lines.find(l => l.trim().length > 0) || '';
-
   return {
     clientName: extractName(emailText) || 'Unknown',
     projectType: extractProjectType(emailText),
