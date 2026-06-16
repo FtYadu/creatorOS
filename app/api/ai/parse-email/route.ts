@@ -16,9 +16,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -149,9 +149,6 @@ function calculateLeadScore(parsed: any): any {
 }
 
 function fallbackParse(emailText: string): any {
-  const lines = emailText.split('\n');
-  const firstLine = lines.find(l => l.trim().length > 0) || '';
-
   return {
     clientName: extractName(emailText) || 'Unknown',
     projectType: extractProjectType(emailText),

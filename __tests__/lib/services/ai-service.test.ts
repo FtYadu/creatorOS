@@ -107,17 +107,19 @@ describe('aiService', () => {
         json: async () => mockResponse,
       });
 
-      const result = await aiService.generateMoodBoard('A cheerful wedding', 'vintage');
+      const prompt = 'Test prompt';
+      const style = 'Test style';
+      const result = await aiService.generateMoodBoard(prompt, style);
 
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledWith('/api/ai/generate-moodboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: 'A cheerful wedding', style: 'vintage' }),
+        body: JSON.stringify({ prompt, style }),
       });
     });
 
-    it('should throw an error on failed mood board generation', async () => {
+    it('should throw an error if the API request fails', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
       });

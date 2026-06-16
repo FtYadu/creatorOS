@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import 'whatwg-fetch'; // This polyfills Request and Response
 
 // Mock environment variables
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
