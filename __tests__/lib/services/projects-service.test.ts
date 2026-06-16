@@ -59,6 +59,28 @@ describe('projectsService', () => {
     });
   });
 
+  describe('delete', () => {
+    it('should delete a project', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+      });
+
+      await projectsService.delete('1');
+
+      expect(global.fetch).toHaveBeenCalledWith('/api/projects/1', {
+        method: 'DELETE',
+      });
+    });
+
+    it('should throw error on failed delete', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(projectsService.delete('1')).rejects.toThrow('Failed to delete project');
+    });
+  });
+
   describe('create', () => {
     it('should create a new project', async () => {
       const newProject = {
