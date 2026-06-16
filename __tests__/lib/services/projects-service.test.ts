@@ -97,4 +97,53 @@ describe('projectsService', () => {
       expect(global.fetch).toHaveBeenCalledWith('/api/projects', expect.any(Object));
     });
   });
+
+  describe('update', () => {
+    it('should update an existing project', async () => {
+      const updates = {
+        clientName: 'Updated Client',
+        budget: 6000,
+      };
+
+      const mockResponse = {
+        id: '1',
+        client_name: 'Updated Client',
+        project_type: 'Wedding',
+        stage: 'leads',
+        deadline: '2024-12-31',
+        budget: 6000,
+        location: 'NYC',
+        requirements: [],
+        urgent: false,
+        created_at: '2024-01-01',
+        updated_at: '2024-01-02',
+      };
+
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: mockResponse }),
+      });
+
+      const project = await projectsService.update('1', updates);
+
+      expect(project.clientName).toBe('Updated Client');
+      expect(project.budget).toBe(6000);
+      expect(global.fetch).toHaveBeenCalledWith('/api/projects/1', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: updates.clientName,
+          budget: updates.budget,
+        }),
+      });
+    });
+
+    it('should throw error on failed fetch', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      await expect(projectsService.update('1', { clientName: 'Fail' })).rejects.toThrow('Failed to update project');
+    });
+  });
 });
