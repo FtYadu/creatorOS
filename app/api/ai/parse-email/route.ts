@@ -30,45 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use Anthropic Claude to parse the email
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: `You are an AI assistant helping photographers and videographers parse client inquiry emails. Extract the following information from this email and return it as a JSON object:
-
-{
-  "clientName": "extracted client name or 'Unknown'",
-  "projectType": "Wedding|Corporate|Event|Portrait|Product|Commercial|Real Estate|Fashion|Other",
-  "budget": "specific amount mentioned or estimate range",
-  "timeline": "when they need the work done",
-  "location": "where the shoot will take place",
-  "requirements": ["array", "of", "specific", "requirements"]
-}
-
-Email:
-${emailText}
-
-Respond ONLY with the JSON object, no other text.`
-      }]
-    });
-
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-    let parsed;
-
-    try {
-      parsed = JSON.parse(responseText);
-    } catch (e) {
-      // Fallback to basic parsing if AI response isn't valid JSON
-      parsed = {
-        clientName: 'Unknown',
-        projectType: 'Other',
-        budget: 'Not specified',
-        timeline: 'Not specified',
-        location: 'Not specified',
-        requirements: [],
-      };
-    }
+    const parsed = await parseEmailWithAI(emailText);
 
     // Calculate lead score
     const score = calculateLeadScore(parsed);
@@ -92,6 +54,48 @@ Respond ONLY with the JSON object, no other text.`
     }
 
     return NextResponse.json({ error: 'Failed to parse email' }, { status: 500 });
+  }
+}
+
+
+async function parseEmailWithAI(emailText: string) {
+  const message = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1024,
+    messages: [{
+      role: 'user',
+      content: `You are an AI assistant helping photographers and videographers parse client inquiry emails. Extract the following information from this email and return it as a JSON object:
+
+{
+  "clientName": "extracted client name or 'Unknown'",
+  "projectType": "Wedding|Corporate|Event|Portrait|Product|Commercial|Real Estate|Fashion|Other",
+  "budget": "specific amount mentioned or estimate range",
+  "timeline": "when they need the work done",
+  "location": "where the shoot will take place",
+  "requirements": ["array", "of", "specific", "requirements"]
+}
+
+Email:
+${emailText}
+
+Respond ONLY with the JSON object, no other text.`
+    }]
+  });
+
+  const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
+
+  try {
+    return JSON.parse(responseText);
+  } catch (e) {
+    // Fallback to basic parsing if AI response isn't valid JSON
+    return {
+      clientName: 'Unknown',
+      projectType: 'Other',
+      budget: 'Not specified',
+      timeline: 'Not specified',
+      location: 'Not specified',
+      requirements: [],
+    };
   }
 }
 
